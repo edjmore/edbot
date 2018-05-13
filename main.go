@@ -3,10 +3,11 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/edjmore/edbot/groupme"
 	"net/http"
 	"os"
 	"strings"
+
+	"github.com/edjmore/edbot/groupme"
 )
 
 func main() {
