@@ -1,6 +1,7 @@
 package groupme
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/json"
 	"fmt"
@@ -30,7 +31,7 @@ type Response struct {
 	Text  string `json:"text"`
 }
 
-func Respond(m Message) {
+func HandleMessage(m Message) {
 	botID, ok := os.LookupEnv("GROUPME_BOT_ID")
 	if !ok {
 		panic("No GROUPME_BOT_ID found.")
@@ -39,12 +40,31 @@ func Respond(m Message) {
 	// Don't send responses to other bots, or our own messages (not sure if necessary).
 	if m.SenderID == botID || m.SenderType != "user" {
 		fmt.Printf("Not sending response to message: %v", m)
-		return
+	} else {
+		r := Response{BotID: botID, Text: craftResponseText(m)}
+		j, err := json.Marshal(r)
+		if err != nil {
+			panic(err)
+		}
+		http.Post("https://api.groupme.com/v3/bots/post", "application/json", bytes.NewBuffer(j))
 	}
-	r := Response{BotID: botID, Text: fmt.Sprintf("%s said \"%s\"", m.Name, m.Text)}
-	j, err := json.Marshal(r)
+
+	saveToMessageLog(m)
+}
+
+func craftResponseText(m Message) string {
+	return fmt.Sprintf("%s said \"%s\"", m.Name, m.Text)
+}
+
+// Save the message to persistent storage.
+// Obviously, this is a temporary implementation that just writes to a file.
+func saveToMessageLog(m Message) {
+	f, err := os.OpenFile("groupme_messages.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
 		panic(err)
 	}
-	http.Post("https://api.groupme.com/v3/bots/post", "application/json", bytes.NewBuffer(j))
+
+	w := bufio.NewWriter(f)
+	j, err := json.Marshal(m)
+	w.WriteString(fmt.Sprintf("%s\n", j))
 }

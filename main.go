@@ -3,10 +3,11 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/edjmore/edbot/groupme"
 	"net/http"
 	"os"
 	"strings"
+
+	"github.com/edjmore/edbot/groupme"
 )
 
 func main() {
@@ -29,6 +30,7 @@ func handleEdBot(w http.ResponseWriter, r *http.Request) {
 		switch r.Method {
 		case http.MethodGet:
 			fmt.Fprint(w, "Hello, I am EdBot.")
+
 		case http.MethodPost:
 			var m groupme.Message
 			if r.Body == nil {
@@ -36,7 +38,7 @@ func handleEdBot(w http.ResponseWriter, r *http.Request) {
 			} else if err := json.NewDecoder(r.Body).Decode(&m); err != nil {
 				http.Error(w, err.Error(), http.StatusBadRequest)
 			} else {
-				groupme.Respond(m)
+				groupme.HandleMessage(m)
 			}
 		}
 	}
