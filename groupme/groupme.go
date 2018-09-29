@@ -63,6 +63,7 @@ func saveToMessageLog(m Message) {
 	if err != nil {
 		panic(err)
 	}
+	defer f.Close()
 
 	w := bufio.NewWriter(f)
 	j, err := json.Marshal(m)
