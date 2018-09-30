@@ -1,13 +1,15 @@
 package groupme
 
 import (
-	"bufio"
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
+	"strings"
 
+	"github.com/edjmore/edbot/db"
 	"github.com/edjmore/edbot/yoda"
 )
 
@@ -55,19 +57,22 @@ func HandleMessage(m Message) {
 }
 
 func craftResponseText(m Message) string {
-	return fmt.Sprintf(yoda.Translate(m.Text))
+	if strings.HasPrefix(m.Text, "@yoda ") {
+		return fmt.Sprintf(yoda.Translate(strings.TrimPrefix(m.Text, "@yoda ")))
+	} else if strings.HasPrefix(m.Text, "@history ") {
+		return "todo"
+	} else {
+		return fmt.Sprintf("%s said \"%s\"", m.Name, m.Text)
+	}
 }
 
 // Save the message to persistent storage.
-// Obviously, this is a temporary implementation that just writes to a file.
 func saveToMessageLog(m Message) {
-	f, err := os.OpenFile("groupme_messages.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	conn := db.Conn()
+	_, err := conn.Exec(
+		"INSERT INTO messages(created_at, group_id, sender_id, text) VALUES(%d, %s, %s, %s)",
+		m.CreatedAt, m.GroupID, m.SenderID, m.Text)
 	if err != nil {
-		panic(err)
+		log.Fatalf("Unable to insert %v, %v\n", m, err)
 	}
-	defer f.Close()
-
-	w := bufio.NewWriter(f)
-	j, err := json.Marshal(m)
-	w.WriteString(fmt.Sprintf("%s\n", j))
 }
