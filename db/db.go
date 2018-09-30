@@ -24,9 +24,9 @@ func createSchema() {
 	q := `
     CREATE TABLE IF NOT EXISTS messages(
       created_at INTEGER NOT NULL,
-      group_id STRING NOT NULL,
-      sender_id STRING NOT NULL,
-      text STRING NOT NULL
+      group_id TEXT NOT NULL,
+      sender_id TEXT NOT NULL,
+      text TEXT NOT NULL
     )`
 	if _, err := conn.Exec(q); err != nil {
 		log.Fatal(err)
