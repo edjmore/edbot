@@ -26,7 +26,7 @@ func createSchema() {
       created_at INTEGER NOT NULL,
       group_id STRING NOT NULL,
       sender_id STRING NOT NULL,
-      text STRING NOT NULLs
+      text STRING NOT NULL
     )`
 	if _, err := conn.Exec(q); err != nil {
 		log.Fatal(err)
