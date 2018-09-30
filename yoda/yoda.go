@@ -8,7 +8,7 @@ import (
 )
 
 type Response struct {
-	Text string `json:"text"`
+	Yodish string `json:"yodish"`
 }
 
 func Translate(text string) string {
@@ -17,10 +17,11 @@ func Translate(text string) string {
 	if err != nil {
 		panic(err)
 	}
+	fmt.Printf("%v\n", r)
 
 	var res Response
 	if err := json.NewDecoder(r.Body).Decode(&res); err != nil {
 		panic(err)
 	}
-	return res.Text
+	return res.Yodish
 }
