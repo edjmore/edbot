@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+
+	"github.com/edjmore/edbot/yoda"
 )
 
 // GroupMe sends this JSON structure when a message is posted to a group.
@@ -53,7 +55,7 @@ func HandleMessage(m Message) {
 }
 
 func craftResponseText(m Message) string {
-	return fmt.Sprintf("%s said \"%s\"", m.Name, m.Text)
+	return fmt.Sprintf(yoda.Translate(m.Text))
 }
 
 // Save the message to persistent storage.
