@@ -70,7 +70,7 @@ func craftResponseText(m Message) string {
 func saveToMessageLog(m Message) {
 	conn := db.Conn()
 	_, err := conn.Exec(
-		"INSERT INTO messages(created_at, group_id, sender_id, text) VALUES(%d, %s, %s, %s)",
+		"INSERT INTO messages(created_at, group_id, sender_id, text) VALUES($1, $2, $3, $4)",
 		m.CreatedAt, m.GroupID, m.SenderID, m.Text)
 	if err != nil {
 		log.Fatalf("Unable to insert %v, %v\n", m, err)
